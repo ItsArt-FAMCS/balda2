@@ -195,25 +195,31 @@ namespace Tools
         private List<string> ShortWords { get; set; }
         private List<string> Used { get; set; }
 
+        private string _word;
+
         public String Word
         {
             get
             {
-                if (way == null)
-                    return string.Empty;
-                if (string.IsNullOrEmpty(way.Word) == false)
+                if (_word == null)
                 {
-                    return way.Word;
+                    if (way == null)
+                        _word = string.Empty;
+                    if (string.IsNullOrEmpty(way.Word) == false)
+                    {
+                        _word = way.Word;
+                    }
+                    if (ShortWords.Contains(way.Text) && (Used.Contains(way.Text) == false))
+                    {
+                        _word = way.Text;
+                    }
+                    if (ShortWords.Contains(way.Reverse) && (Used.Contains(way.Reverse) == false))
+                    {
+                        _word = way.Reverse;
+                    }
                 }
-                if (ShortWords.Contains(way.Text) && (Used.Contains(way.Text) == false))
-                {
-                    return way.Text;
-                }
-                if (ShortWords.Contains(way.Reverse) && (Used.Contains(way.Reverse) == false))
-                {
-                    return way.Reverse;
-                }
-                return string.Empty;
+                
+                return _word;
             }
         }
 

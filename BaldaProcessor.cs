@@ -86,13 +86,21 @@ namespace Tools
                     }
                 }
             }
-            if (result != null)
+            if (result == null)
             {
-                var field = result.GetStartField();
-                field.Step = null;
-                Desk[field.X, field.Y] = field;
+                return null;
+            } 
+            var field = result.GetStartField();
+            Desk[field.X, field.Y] = new Field(field.X, field.Y)
+            {
+                Value = field.Value
+            };
+            var viewResult = new WayView(result, ShortWordsContainer, Used);
+            if (!string.IsNullOrEmpty(viewResult.Word))
+            {
+                Used.Add(viewResult.Word);
             }
-            return new WayView(result, ShortWordsContainer, Used);
+            return viewResult;
         }
 
         public bool IsLegalWord(string word)
