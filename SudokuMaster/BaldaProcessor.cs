@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-//using System.Threading.Tasks;
+using System.Threading.Tasks;
 
-namespace SudokuMaster
+namespace Tools
 {
     class BaldaProcessor
     {
         public const int KeyLength = 4;
         public const int Size = 7;
         public const string Alphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
-        //абвгдеёжзийклмнопрстуфхцчшщъыьэюя
+
         //Singleton
         private static readonly BaldaProcessor _instance = new BaldaProcessor();
         public static BaldaProcessor Instance
@@ -25,15 +25,110 @@ namespace SudokuMaster
         private Dictionary<string, List<string>> LongWordsContainer { get; set; }
         private List<string> ShortWordsContainer { get; set; }
 
-        public void InitializeDictionaries(String words)
+        private Field[,] Desk { get; set; }
+
+        public List<string> Used { get; set; }
+
+        public char[,] Initialize(String words)
         {
-            Words = words.Split(new []{"\r\n"}, StringSplitOptions.RemoveEmptyEntries).ToList();
+            InitializeDictionaries(words);
+            return Restart();
+        }
+
+        public char[,] Restart()
+        {
+            var result = new char[Size, Size];
+            Desk = new Field[Size, Size];
+
+            var startWords = Words.Where(e => e.Length == Size).ToArray();
+            var rand = new Random();
+            var wordNumber = rand.Next(0, startWords.Count() - 1);
+            var startword = startWords[wordNumber];
+            Used = new List<string> {startword};
+
+            for (int i = 0; i < Size; i++)
+            {
+                for (int j = 0; j < Size; j++)
+                {
+                    var val = i == Size / 2 ? startword[j] : ' ';
+                    var field = new Field(i, j)
+                    {
+                        Value = val
+                    };
+                    Desk[i, j] = field;
+                    result[i, j] = val;
+                }
+            }
+            return result;
+        }
+
+        public WayView AIProcess()
+        {
+            Way result = null;
+            for (int i = 0; i < Size; i++)
+            {
+                for (int j = 0; j < Size; j++)
+                {
+                    if (Desk[i, j].Value == ' ')
+                    {
+                        foreach (var letter in Alphabet)
+                        {
+                            var startField = new Field(i, j)
+                            {
+                                Value = letter
+                            };
+                            var way = GetBestWay(startField);
+                            if (way != null && (result == null || result.Text.Length < way.Text.Length))
+                            {
+                                result = way;
+                            }
+                        }
+                    }
+                }
+            }
+            if (result == null)
+            {
+                return null;
+            } 
+            var field = result.GetStartField();
+            Desk[field.X, field.Y] = new Field(field.X, field.Y)
+            {
+                Value = field.Value
+            };
+            var viewResult = new WayView(result, ShortWordsContainer, Used);
+            if (!string.IsNullOrEmpty(viewResult.Word))
+            {
+                Used.Add(viewResult.Word);
+            }
+            return viewResult;
+        }
+
+        public bool IsLegalWord(string word)
+        {
+            word = word.ToLower().Trim();
+            return Words.Contains(word) && !Used.Contains(word);
+        }
+
+        public bool AddWord(string word, Field field)
+        {
+            if (IsLegalWord(word))
+            {
+                field.Step = null;
+                Desk[field.X, field.Y] = field;
+                Used.Add(word);
+                return true;
+            }
+            return false;
+        }
+        
+        protected void InitializeDictionaries(String words)
+        {
+            Words = words.Split(new[] { ' ', '\r', '\n', '\t' }).Where(e => e != string.Empty).Select(e=> e.ToLower().Trim()).ToList();
             LongWordsContainer = new Dictionary<string, List<string>>();
             ShortWordsContainer = new List<string>();
 
-            foreach (var w in Words)
+            foreach (var word in Words)
             {
-                var word = w.ToLower().Trim();
                 if (word.Length >= KeyLength)
                 {
                     var keys = new List<String>();
@@ -66,63 +161,17 @@ namespace SudokuMaster
                         }
                     }
                 }
-                else if (string.IsNullOrWhiteSpace(word) == false)
+                else
                 {
                     ShortWordsContainer.Add(word);
                 }
             }
         }
 
-        public Way Process(char[,] values, List<string> used)
-        {
-            //Initialize desk
-            var desk = new Field[Size, Size];
-            for (int i = 0; i < Size; i++)
-            {
-                for (int j = 0; j < Size; j++)
-                {
-                    var field = new Field(i, j)
-                    {
-                        Value = Alphabet.Contains(values[i, j]) ? values[i, j] : ' '
-                    };
-                    desk[i, j] = field;
-                }
-            }
-
-            Way result = null;
-            for (int i = 0; i < Size; i++)
-            {
-                for (int j = 0; j < Size; j++)
-                {
-                    if (desk[i, j].Value == ' ')
-                    {
-                        foreach (var letter in Alphabet)
-                        {
-                            var startField = new Field(i, j)
-                            {
-                                Value = letter
-                            };
-                            var way = GetBestWay(desk, startField, used);
-                            if (way != null && (result == null || result.Text.Length < way.Text.Length))
-                            {
-                                result = way;
-                            }
-                        }
-                    }
-                }
-            }
-            return result;
-        }
-
-        public bool IsWord(string word)
-        {
-            return Words.Contains(word.ToLower().Trim());
-        }
-
-        protected List<Way> GetStartWays(Field[,] desk, Field start)
+        protected List<Way> GetStartWays(Field start)
         {
             var ways = new List<Way>();
-            var startWay = new Way(desk, start);
+            var startWay = new Way(Desk, start);
             var startNeighbors = startWay.GetNeighbors(start);
             foreach (var neighbor in startNeighbors)
             {
@@ -157,20 +206,20 @@ namespace SudokuMaster
             return result;
         }
 
-        protected Way GetBestWay(Field[,] desk, Field start, List<string> used)
+        protected Way GetBestWay(Field start)
         {
             //Get Start Keys
-            var ways = GetStartWays(desk, start);
+            var ways = GetStartWays(start);
             if (ways.Count == 0)
                 return null;
-            var result = ways.FirstOrDefault(way => (ShortWordsContainer.Contains(way.Text) && (used.Contains(way.Text) == false))
-                || (ShortWordsContainer.Contains(way.Reverse) && (used.Contains(way.Reverse) == false)));
+            var result = ways.FirstOrDefault(way => (ShortWordsContainer.Contains(way.Text) && (Used.Contains(way.Text) == false))
+                || (ShortWordsContainer.Contains(way.Reverse) && (Used.Contains(way.Reverse) == false)));
 
             for (int i = 0; i < KeyLength - 2; i++)
             {
                 ways = ExtendLastWays(ways);
-                foreach (var way in ways.Where(way => (ShortWordsContainer.Contains(way.Text) && (used.Contains(way.Text) == false))
-                || (ShortWordsContainer.Contains(way.Reverse) && (used.Contains(way.Reverse) == false))))
+                foreach (var way in ways.Where(way => (ShortWordsContainer.Contains(way.Text) && (Used.Contains(way.Text) == false))
+                || (ShortWordsContainer.Contains(way.Reverse) && (Used.Contains(way.Reverse) == false))))
                 {
                     result = way;
                     break;
@@ -180,7 +229,7 @@ namespace SudokuMaster
             foreach (var way in ways)
             {
                 way.Words = LongWordsContainer.ContainsKey(way.Text) ? LongWordsContainer[way.Text] : new List<string>();
-                if ((way.IsWord && used.Contains(way.Word) == false) || (way.TwoWords && used.Contains(way.Reverse) == false))
+                if ((way.IsWord && Used.Contains(way.Word) == false) || (way.TwoWords && Used.Contains(way.Reverse) == false))
                 {
                     result = way;
                 }
@@ -198,7 +247,7 @@ namespace SudokuMaster
                         ways.Add(way);
                     }
                     if ((result == null || way.Text.Length > result.Text.Length) 
-                        && ((way.IsWord && used.Contains(way.Word) == false) || (way.TwoWords && used.Contains(way.Reverse) == false)))
+                        && ((way.IsWord && Used.Contains(way.Word) == false) || (way.TwoWords && Used.Contains(way.Reverse) == false)))
                     {
                         result = way;
                     }

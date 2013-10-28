@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-//using System.Threading.Tasks;
+using System.Threading.Tasks;
 
-namespace SudokuMaster
+namespace Tools
 {
     class Way
     {
@@ -81,10 +81,10 @@ namespace SudokuMaster
             {
                 for (int j = 0; j < BaldaProcessor.Size; j++)
                 {
-                    Desk[i,j] = new Field(i , j)
+                    Desk[i, j] = new Field(i, j)
                         {
-                            Value = desk[i,j].Value,
-                            Step = desk[i,j].Step
+                            Value = desk[i, j].Value,
+                            Step = desk[i, j].Step
                         };
                 }
             }
@@ -97,7 +97,7 @@ namespace SudokuMaster
             {
                 for (int j = 0; j < BaldaProcessor.Size; j++)
                 {
-                    Desk[i,j] = new Field(i , j)
+                    Desk[i, j] = new Field(i, j)
                         {
                             Value = desk[i, j].Value,
                             Step = desk[i, j].Step
@@ -186,6 +186,53 @@ namespace SudokuMaster
                 }
             }
             return null;
+        }
+    }
+
+    class WayView
+    {
+        private Way way { get; set; }
+        private List<string> ShortWords { get; set; }
+        private List<string> Used { get; set; }
+
+        private string _word;
+
+        public String Word
+        {
+            get
+            {
+                if (_word == null)
+                {
+                    if (way == null)
+                        _word = string.Empty;
+                    if (string.IsNullOrEmpty(way.Word) == false)
+                    {
+                        _word = way.Word;
+                    }
+                    if (ShortWords.Contains(way.Text) && (Used.Contains(way.Text) == false))
+                    {
+                        _word = way.Text;
+                    }
+                    if (ShortWords.Contains(way.Reverse) && (Used.Contains(way.Reverse) == false))
+                    {
+                        _word = way.Reverse;
+                    }
+                }
+                
+                return _word;
+            }
+        }
+
+        public Field NewField
+        {
+            get { return way.GetStartField(); }
+        }
+
+        public WayView(Way way, List<string> shortWords, List<string> used)
+        {
+            this.way = way;
+            ShortWords = shortWords;
+            Used = used;
         }
     }
 }
