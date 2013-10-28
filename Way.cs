@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace testBalda.BaldaProcessor
+namespace Tools
 {
     class Way
     {
@@ -81,10 +81,10 @@ namespace testBalda.BaldaProcessor
             {
                 for (int j = 0; j < BaldaProcessor.Size; j++)
                 {
-                    Desk[i,j] = new Field(i , j)
+                    Desk[i, j] = new Field(i, j)
                         {
-                            Value = desk[i,j].Value,
-                            Step = desk[i,j].Step
+                            Value = desk[i, j].Value,
+                            Step = desk[i, j].Step
                         };
                 }
             }
@@ -97,7 +97,7 @@ namespace testBalda.BaldaProcessor
             {
                 for (int j = 0; j < BaldaProcessor.Size; j++)
                 {
-                    Desk[i,j] = new Field(i , j)
+                    Desk[i, j] = new Field(i, j)
                         {
                             Value = desk[i, j].Value,
                             Step = desk[i, j].Step
@@ -186,6 +186,47 @@ namespace testBalda.BaldaProcessor
                 }
             }
             return null;
+        }
+    }
+
+    class WayView
+    {
+        private Way way { get; set; }
+        private List<string> ShortWords { get; set; }
+        private List<string> Used { get; set; }
+
+        public String Word
+        {
+            get
+            {
+                if (way == null)
+                    return string.Empty;
+                if (string.IsNullOrEmpty(way.Word) == false)
+                {
+                    return way.Word;
+                }
+                if (ShortWords.Contains(way.Text) && (Used.Contains(way.Text) == false))
+                {
+                    return way.Text;
+                }
+                if (ShortWords.Contains(way.Reverse) && (Used.Contains(way.Reverse) == false))
+                {
+                    return way.Reverse;
+                }
+                return string.Empty;
+            }
+        }
+
+        public Field NewField
+        {
+            get { return way.GetStartField(); }
+        }
+
+        public WayView(Way way, List<string> shortWords, List<string> used)
+        {
+            this.way = way;
+            ShortWords = shortWords;
+            Used = used;
         }
     }
 }
