@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
+using SudokuMaster.Tools;
 
 namespace SudokuMaster
 {

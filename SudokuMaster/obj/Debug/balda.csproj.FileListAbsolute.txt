@@ -30,3 +30,14 @@ C:\Users\Nath\Desktop\sudokumaster_silverlight\SudokuMaster\obj\Debug\balda.g.re
 C:\Users\Nath\Desktop\sudokumaster_silverlight\SudokuMaster\obj\Debug\balda.dll
 C:\Users\Nath\Desktop\sudokumaster_silverlight\SudokuMaster\obj\Debug\balda.pdb
 C:\Users\Nath\Desktop\sudokumaster_silverlight\SudokuMaster\obj\Debug\balda.csprojResolveAssemblyReference.cache
+C:\Users\Valery\Documents\GitHub\balda2\SudokuMaster\obj\Debug\balda.csprojResolveAssemblyReference.cache
+C:\Users\Valery\Documents\GitHub\balda2\SudokuMaster\obj\Debug\App.g.cs
+C:\Users\Valery\Documents\GitHub\balda2\SudokuMaster\obj\Debug\Cell.g.cs
+C:\Users\Valery\Documents\GitHub\balda2\SudokuMaster\obj\Debug\GameOver.g.cs
+C:\Users\Valery\Documents\GitHub\balda2\SudokuMaster\obj\Debug\HighscoresPage.g.cs
+C:\Users\Valery\Documents\GitHub\balda2\SudokuMaster\obj\Debug\MainPage.g.cs
+C:\Users\Valery\Documents\GitHub\balda2\SudokuMaster\obj\Debug\NumberSelection.g.cs
+C:\Users\Valery\Documents\GitHub\balda2\SudokuMaster\obj\Debug\WaitNote.g.cs
+C:\Users\Valery\Documents\GitHub\balda2\SudokuMaster\obj\Debug\balda.g.resources
+C:\Users\Valery\Documents\GitHub\balda2\SudokuMaster\obj\Debug\balda.dll
+C:\Users\Valery\Documents\GitHub\balda2\SudokuMaster\obj\Debug\balda.pdb
